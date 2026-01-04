@@ -9,7 +9,13 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "npm": {
+        "installFlags": "--legacy-peer-deps"
+      }
     },
     "production": {
       "autoIncrement": true
