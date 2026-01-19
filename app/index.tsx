@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, FlatList, TouchableOpacity, TextInput } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useTransactions } from "../store/TransactionContext";

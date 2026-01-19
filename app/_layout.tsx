@@ -23,27 +23,33 @@ function AppContent() {
     }, [biometricEnabled]);
 
     const authenticate = async () => {
-        // If biometric is disabled in settings, skip authentication
-        if (!biometricEnabled) {
+        try {
+            // If biometric is disabled in settings, skip authentication
+            if (!biometricEnabled) {
+                setIsUnlocked(true);
+                return;
+            }
+
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            if (!hasHardware) {
+                setIsUnlocked(true); // No biometric hardware, fallback to open
+                return;
+            }
+
+            const { success } = await LocalAuthentication.authenticateAsync({
+                promptMessage: "Unlock Debt Manager",
+                fallbackLabel: "Enter Passcode",
+            });
+
+            if (success) {
+                setIsUnlocked(true);
+            } else {
+                // Optional: Alert or just stay locked
+            }
+        } catch (error) {
+            // If any error occurs (permissions, API failure, etc.), unlock the app
+            console.error("Biometric authentication error:", error);
             setIsUnlocked(true);
-            return;
-        }
-
-        const hasHardware = await LocalAuthentication.hasHardwareAsync();
-        if (!hasHardware) {
-            setIsUnlocked(true); // No biometric hardware, fallback to open
-            return;
-        }
-
-        const { success } = await LocalAuthentication.authenticateAsync({
-            promptMessage: "Unlock Debt Manager",
-            fallbackLabel: "Enter Passcode",
-        });
-
-        if (success) {
-            setIsUnlocked(true);
-        } else {
-            // Optional: Alert or just stay locked
         }
     };
 

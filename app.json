@@ -4,11 +4,11 @@
     "slug": "dept-manager",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.jpg",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.jpg",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#030712"
     },
@@ -23,7 +23,7 @@
       "package": "com.tom.debtmanager",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#030712"
       },
       "permissions": [
@@ -34,7 +34,7 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-router",
@@ -49,9 +49,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "a1a3426a-747c-477b-9c9e-310306559db4"
+        "projectId": "7e3b6163-be9c-4a47-b1e9-f712d3003aac"
       }
     },
-    "owner": "debt-manager"
+    "owner": "aymanef"
   }
 }

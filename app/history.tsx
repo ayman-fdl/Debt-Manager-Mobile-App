@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import { useTransactions } from "../store/TransactionContext";
 import { TransactionCard } from "../components/TransactionCard";
