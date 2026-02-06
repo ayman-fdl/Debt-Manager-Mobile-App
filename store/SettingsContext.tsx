@@ -10,6 +10,7 @@ interface SettingsContextType {
     setLockHistory: (value: boolean) => void;
     hasOnboarded: boolean;
     completeOnboarding: () => void;
+    isLoadingSettings: boolean;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -20,6 +21,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [ignoreCaseName, setIgnoreCaseNameState] = useState<boolean>(false);
     const [biometricEnabled, setBiometricEnabledState] = useState<boolean>(false);
     const [lockHistory, setLockHistoryState] = useState<boolean>(false);
+    const [isLoadingSettings, setIsLoadingSettings] = useState<boolean>(true);
+    const [hasOnboarded, setHasOnboardedState] = useState<boolean>(false);
 
     useEffect(() => {
         loadSettings();
@@ -52,10 +55,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                     console.error("Failed to parse settings", parseError);
                     // Continue with default settings
                 }
+            } else {
+                // No settings found - first time app open
+                setHasOnboardedState(false);
             }
         } catch (e) {
             console.error("Failed to load settings", e);
             // Continue with default settings on error
+        } finally {
+            // Always set loading to false after attempt
+            setIsLoadingSettings(false);
         }
     };
 
@@ -152,7 +161,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const [hasOnboarded, setHasOnboardedState] = useState<boolean>(true); // Default to true to prevent flash, wait for load
 
     const completeOnboarding = async () => {
         setHasOnboardedState(true);
@@ -176,7 +184,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             ignoreCaseName, setIgnoreCaseName,
             biometricEnabled, setBiometricEnabled,
             lockHistory, setLockHistory,
-            hasOnboarded, completeOnboarding
+            hasOnboarded, completeOnboarding,
+            isLoadingSettings
         }}>
             {children}
         </SettingsContext.Provider>

@@ -1,0 +1,10 @@
+production
+npx eas-cli build --platform android --profile production
+
+development
+npx expo start -c
+
+TO DO:
+- Feat: Choose your currency from settings (Dollar (USD), Euro (EUR), Dirham (DHS))
+- Feat: Add 'edit option' to the 'add' screen (edit name, description, money amount)
+- Fix: in the partial payment history, show the total money amount and also all partial payments

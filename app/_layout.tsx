@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function AppContent() {
     const [isUnlocked, setIsUnlocked] = useState(false);
@@ -91,8 +92,10 @@ function AppContent() {
 
 export default function Layout() {
     return (
-        <SettingsProvider>
-            <AppContent />
-        </SettingsProvider>
+        <SafeAreaProvider>
+            <SettingsProvider>
+                <AppContent />
+            </SettingsProvider>
+        </SafeAreaProvider>
     );
 }

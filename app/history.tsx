@@ -226,6 +226,7 @@ export default function History() {
                                 transaction={transaction}
                                 index={idx}
                                 isReadOnly={lockHistory ? !isEditMode : false}
+                                viewMode="history"
                             />
                         ))}
                     </View>

@@ -6,10 +6,14 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeOut, SlideInRight, SlideOutLeft } from "react-native-reanimated";
 
 export function OnboardingModal() {
-    const { hasOnboarded, completeOnboarding } = useSettings();
+    const { hasOnboarded, completeOnboarding, isLoadingSettings } = useSettings();
     const { language, setLanguage, t } = useLanguage();
     const [step, setStep] = useState(0); // 0 = Language, 1,2,3 = Tutorial
 
+    // Don't render anything while settings are loading
+    if (isLoadingSettings) return null;
+
+    // Don't render if user has already onboarded
     if (hasOnboarded) return null;
 
     const languages = [
@@ -62,8 +66,8 @@ export function OnboardingModal() {
                 <View className="w-20 h-20 bg-blue-500/20 rounded-full items-center justify-center mb-6">
                     <Ionicons name="globe-outline" size={40} color="#3b82f6" />
                 </View>
-                <Text className="text-white text-3xl font-bold mb-2 text-center">Select Language</Text>
-                <Text className="text-gray-400 text-base text-center">Choose your preferred language</Text>
+                <Text className="text-white text-3xl font-bold mb-2 text-center">{t('select_language_title')}</Text>
+                <Text className="text-gray-400 text-base text-center">{t('select_language_subtitle')}</Text>
             </View>
 
             <View className="w-full gap-4">

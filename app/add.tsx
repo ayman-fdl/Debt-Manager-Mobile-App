@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useTransactions } from "../store/TransactionContext";
@@ -9,7 +9,6 @@ import { StyledModal } from "../components/StyledModal";
 import { DebtType } from "../types";
 import { CURRENCY_SYMBOL } from "../constants/Config";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as Contacts from 'expo-contacts';
 import { Ionicons } from '@expo/vector-icons';
 import { validateTransaction } from "../utils/errorHandler";
 import { useError } from "../store/ErrorContext";
@@ -33,13 +32,6 @@ export default function AddTransaction() {
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
-
-    // Contacts State
-    const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
-    const [filteredContacts, setFilteredContacts] = useState<Contacts.Contact[]>([]);
-    const [showContactModal, setShowContactModal] = useState(false);
-    const [loadingContacts, setLoadingContacts] = useState(false);
-    const [contactSearch, setContactSearch] = useState("");
     const [notice, setNotice] = useState({ visible: false, title: "", message: "" });
 
     // Dynamic Colors based on Type
@@ -128,78 +120,6 @@ export default function AddTransaction() {
         setDate(currentDate);
     };
 
-    const fetchContacts = async () => {
-        setLoadingContacts(true);
-        try {
-            const { status } = await Contacts.requestPermissionsAsync();
-
-            if (status === 'granted') {
-                try {
-                    const { data } = await Contacts.getContactsAsync({
-                        fields: [Contacts.Fields.Name, Contacts.Fields.ID],
-                        sort: Contacts.SortTypes.FirstName,
-                    });
-
-                    if (data && data.length > 0) {
-                        setContacts(data);
-                        setFilteredContacts(data);
-                        setShowContactModal(true);
-                    } else {
-                        setNotice({
-                            visible: true,
-                            title: t('error'),
-                            message: t('no_contacts') || "No contacts found on this device."
-                        });
-                    }
-                } catch (fetchError) {
-                    showError(fetchError, 'Failed to fetch contacts');
-                    setNotice({
-                        visible: true,
-                        title: t('error'),
-                        message: "Failed to load contacts. Please try again."
-                    });
-                }
-            } else {
-                setNotice({
-                    visible: true,
-                    title: t('error'),
-                    message: t('error_contacts') || "Permission to access contacts was denied."
-                });
-            }
-        } catch (error) {
-            showError(error, 'Failed to request contacts permission');
-            setNotice({
-                visible: true,
-                title: t('error'),
-                message: "Failed to access contacts. Please check app permissions."
-            });
-        } finally {
-            setLoadingContacts(false);
-        }
-    };
-
-    const searchContacts = (text: string) => {
-        setContactSearch(text);
-        if (text) {
-            const newData = contacts.filter(item => {
-                const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
-                const textData = text.toUpperCase();
-                return itemData.indexOf(textData) > -1;
-            });
-            setFilteredContacts(newData);
-        } else {
-            setFilteredContacts(contacts);
-        }
-    };
-
-    const selectContact = (contactName: string) => {
-        if (contactName) {
-            setName(contactName);
-            setShowContactModal(false);
-            setContactSearch("");
-        }
-    };
-
     return (
         <View className="flex-1 bg-gray-950 px-4 pt-12">
             <StatusBar style="light" />
@@ -274,23 +194,15 @@ export default function AddTransaction() {
                     {/* Person Input */}
                     <View>
                         <Text className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2 ml-1">{t('person_name')}</Text>
-                        <View className="flex-row gap-2">
-                            <View className="flex-1 bg-gray-900 border border-gray-800 rounded-xl flex-row items-center px-4 py-1">
-                                <Ionicons name="person-outline" size={20} color="#6b7280" />
-                                <TextInput
-                                    className="flex-1 text-white p-3 text-base font-medium"
-                                    placeholder={t('name_placeholder')}
-                                    placeholderTextColor="#4b5563"
-                                    value={name}
-                                    onChangeText={setName}
-                                />
-                            </View>
-                            <TouchableOpacity
-                                onPress={fetchContacts}
-                                className="w-14 bg-gray-900 border border-gray-800 rounded-xl justify-center items-center active:bg-gray-800"
-                            >
-                                <Ionicons name="people" size={22} color="#9ca3af" />
-                            </TouchableOpacity>
+                        <View className="bg-gray-900 border border-gray-800 rounded-xl flex-row items-center px-4 py-1">
+                            <Ionicons name="person-outline" size={20} color="#6b7280" />
+                            <TextInput
+                                className="flex-1 text-white p-3 text-base font-medium"
+                                placeholder={t('name_placeholder')}
+                                placeholderTextColor="#4b5563"
+                                value={name}
+                                onChangeText={setName}
+                            />
                         </View>
                     </View>
 
@@ -389,73 +301,6 @@ export default function AddTransaction() {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-
-            {/* Contact Picker Modal - using same style as index.tsx */}
-            <StyledModal
-                visible={showContactModal}
-                onClose={() => setShowContactModal(false)}
-                title={t('select_contact')}
-            >
-                <View className="flex-1">
-                    {/* Enhanced Search Bar */}
-                    <View className="flex-row items-center bg-gray-800/80 rounded-2xl px-5 py-4 mb-6 border border-gray-700/50 shadow-lg">
-                        <View className="mr-3">
-                            <Ionicons name="search" size={22} color="#60a5fa" />
-                        </View>
-                        <TextInput
-                            className="flex-1 text-white text-base font-medium"
-                            placeholder={t('search_contacts')}
-                            placeholderTextColor="#6b7280"
-                            value={contactSearch}
-                            onChangeText={searchContacts}
-                            autoCorrect={false}
-                        />
-                        {contactSearch.length > 0 && (
-                            <TouchableOpacity
-                                onPress={() => searchContacts("")}
-                                className="ml-2 p-1"
-                            >
-                                <Ionicons name="close-circle" size={22} color="#9ca3af" />
-                            </TouchableOpacity>
-                        )}
-                    </View>
-
-                    {loadingContacts ? (
-                        <ActivityIndicator size="large" color="#60a5fa" className="my-10" />
-                    ) : (
-                        <FlatList
-                            data={filteredContacts}
-                            keyExtractor={(item: any) => item.id || item.name}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    className="px-5 py-4 bg-gray-800/60 rounded-2xl mb-3 border border-gray-700/50 active:bg-blue-900/30 active:border-blue-500/50 active:scale-[0.98] shadow-sm"
-                                    onPress={() => selectContact(item.name)}
-                                >
-                                    <View className="flex-row items-center gap-4">
-                                        <View className="w-12 h-12 bg-blue-500/20 rounded-full items-center justify-center border-2 border-blue-500/30 shadow-sm">
-                                            <Text className="text-blue-400 font-bold text-lg">
-                                                {item.name ? item.name.charAt(0).toUpperCase() : '?'}
-                                            </Text>
-                                        </View>
-                                        <Text className="text-white text-lg font-semibold flex-1">{item.name}</Text>
-                                        <Ionicons name="chevron-forward" size={20} color="#4b5563" />
-                                    </View>
-                                </TouchableOpacity>
-                            )}
-                            contentContainerStyle={{ paddingBottom: 100 }}
-                            ListEmptyComponent={() => (
-                                <View className="items-center py-20">
-                                    <View className="w-20 h-20 bg-gray-800/50 rounded-full items-center justify-center mb-4">
-                                        <Ionicons name="person-remove-outline" size={40} color="#6b7280" />
-                                    </View>
-                                    <Text className="text-gray-400 mt-4 text-lg font-semibold">{t('no_contacts')}</Text>
-                                    <Text className="text-gray-500 mt-2 text-sm text-center">{t('search_empty')}</Text>
-                                </View>
-                            )}
-                        />
-                    )}
-                </View>
-            </StyledModal>
 
             {/* Notice Modal */}
             <StyledModal

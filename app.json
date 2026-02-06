@@ -26,11 +26,6 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#030712"
       },
-      "permissions": [
-        "READ_CONTACTS",
-        "android.permission.READ_CONTACTS",
-        "android.permission.WRITE_CONTACTS"
-      ],
       "edgeToEdgeEnabled": true
     },
     "web": {
@@ -38,13 +33,7 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-community/datetimepicker",
-      [
-        "expo-contacts",
-        {
-          "contactsPermission": "Allow Debt Manager to access your contacts to select people you owe or who owe you."
-        }
-      ]
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "router": {},
